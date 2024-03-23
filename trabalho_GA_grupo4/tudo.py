@@ -223,13 +223,13 @@ def crossover_perfect(lista_de_pontos1, lista_de_pontos2):
     return offspring
 
 
-def distinct_check(lista_de_pontos):
+def distinct_check(lista_de_pontos, valor_soma):
     soma = 0
 
     for i in range(len(lista_de_pontos)):
         soma += lista_de_pontos[i].id
     
-    if soma == 1326:
+    if soma == valor_soma:
         return True
     return False
 
@@ -275,8 +275,7 @@ def algoritmo_genetico_completo(caminhos_randomicos_quantidade, numero_geracoes,
         
     return max(data_population, key=fitness)
 
-melhor_solucao = algoritmo_genetico_completo(51, 100, 0.2, example)
+melhor_solucao = algoritmo_genetico_completo(100, 1000, 0.2, example)
 
 print(fitness(melhor_solucao))
-#for i in range(len(melhor_solucao)):
-#    print(melhor_solucao[i].id)
+print(distinct_check(melhor_solucao, 1326))
