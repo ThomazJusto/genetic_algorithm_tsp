@@ -71,8 +71,6 @@ def gerador_de_lista_de_objetos_pontos(lista):
 
 #fitness de uma lista de pontos (consideramos a ordem dos pontos na lista como a ordem de conexao entre cada um)
 def fitness(lista_de_pontos_no_mapa):
-    def calcular_distancia(p1, p2):
-        return math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
     
     custo_total = 0.0
     num_pontos = len(lista_de_pontos_no_mapa)
@@ -84,6 +82,9 @@ def fitness(lista_de_pontos_no_mapa):
     custo_total += calcular_distancia(lista_de_pontos_no_mapa[len(lista_de_pontos_no_mapa)-1], lista_de_pontos_no_mapa[0])
         
     return custo_total
+
+def calcular_distancia(p1, p2):
+        return math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
 
 #elitismo (recebe uma lista de mapas, ou seja, a posicao 0 conterá uma lista de pontos). Por isso utilizamos a funcao fitness para calculo de custo em cada iteracao
 # exemplo de estrutura que sera recebida: (ponto = objeto)
@@ -189,6 +190,39 @@ def crossover_custom(lista_de_pontos1, lista_de_pontos2):
     nova_lista = list(nova_lista)
     return nova_lista
 
+def crossover_perfect(lista_de_pontos1, lista_de_pontos2):
+    offspring = []
+
+    # Step 1: Choose initial city randomly
+    initial_city = random.choice(lista_de_pontos1)
+    offspring.append(initial_city)
+
+    visited_cities = set([initial_city.id])
+
+    while len(offspring) < len(lista_de_pontos1):
+        current_city = offspring[-1]
+        index1 = lista_de_pontos1.index(current_city)
+        index2 = lista_de_pontos2.index(current_city)
+
+        # Find the nearest unvisited city
+        min_distance = float('inf')
+        nearest_city = None
+        for index, lista_de_pontos in [(index1, lista_de_pontos1), (index2, lista_de_pontos2)]:
+            for i in range(1, len(lista_de_pontos)):
+                next_city = lista_de_pontos[(index + i) % len(lista_de_pontos)]
+                if next_city.id not in visited_cities:
+                    distance = calcular_distancia(current_city, next_city)
+                    if distance < min_distance:
+                        min_distance = distance
+                        nearest_city = next_city
+
+        # Add the nearest unvisited city to offspring
+        offspring.append(nearest_city)
+        visited_cities.add(nearest_city.id)
+
+    return offspring
+
+
 def distinct_check(lista_de_pontos):
     soma = 0
 
@@ -223,8 +257,9 @@ def algoritmo_genetico_completo(caminhos_randomicos_quantidade, numero_geracoes,
         new_population = []
 
         for i in range(caminhos_randomicos_quantidade):
-            pai, mae = selecao_dois_melhores(data_population)
-            crianca = crossover_custom(pai, mae)
+            pai = selecao(data_population)
+            mae = selecao(data_population)
+            crianca = crossover_perfect(pai, mae)
 
             if random.random() <= rate_de_mutacao: 
                 crianca = mutate(crianca)
@@ -240,7 +275,7 @@ def algoritmo_genetico_completo(caminhos_randomicos_quantidade, numero_geracoes,
         
     return max(data_population, key=fitness)
 
-melhor_solucao = algoritmo_genetico_completo(100, 500, 0.1, example)
+melhor_solucao = algoritmo_genetico_completo(51, 100, 0.2, example)
 
 print(fitness(melhor_solucao))
 #for i in range(len(melhor_solucao)):
