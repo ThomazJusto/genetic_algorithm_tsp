@@ -103,6 +103,22 @@ def selecao(lista_de_direcoes):
             custo = parametro
     return selecionado
 
+#retorna um caminho (lista de pontos) aleatorio
+def selecao_torneio(lista_de_direcoes):
+    return lista_de_direcoes[random.randint(0, len(lista_de_direcoes))-1]
+
+#escolhe os dois melhores
+def selecao_dois_melhores(lista_de_direcoes):
+    lista_de_direcoes_auxiliar = lista_de_direcoes.copy()
+
+    selecionado1 = selecao(lista_de_direcoes_auxiliar)
+    lista_de_direcoes_auxiliar.remove(selecionado1)
+
+    selecionado2 = selecao(lista_de_direcoes_auxiliar)
+    lista_de_direcoes_auxiliar.remove(selecionado2)
+    
+    return selecionado1, selecionado2
+
 #recebe uma lista de objetos e retorna uma nova ordem (lembrando que essa ordem esta ligada ao CAMINHO que esta sendo percorrido)
 #exemplo de recebimento:
 # [ponto, ponto, ponto...]
@@ -127,15 +143,61 @@ def mutate(lista_de_pontos):
     return lista_de_pontos
     #retorna [ponto, ponto, ponto...]
 
-#cruzamento tipo N-POINT -> reproducao -> recebe duas listas de pontos, e partir disso gera um filho (a escolha do corte é randomica)
+#cruzamento tipo single-point -> reproducao -> recebe duas listas de pontos, e partir disso gera um filho (a escolha do corte é randomica)
 def crossover(lista_de_pontos1, lista_de_pontos2):
     nova_lista = []
-    random_number = random.randrange(0, len(lista_de_pontos2))
+    random_number = random.randint(0, len(lista_de_pontos2))
     for i in range(random_number):
         nova_lista.append(lista_de_pontos1[i])
+
     for i in range(random_number, len(lista_de_pontos2)):
         nova_lista.append(lista_de_pontos2[i])
+
     return nova_lista
+
+#cruzamento tipo double-point 
+def crossover_doublepoint(lista_de_pontos1, lista_de_pontos2):
+    nova_lista = []
+    
+    # Seleciona aleatoriamente dois pontos de corte
+    corte1 = random.randint(0, len(lista_de_pontos1) - 1)
+    corte2 = random.randint(corte1 + 1, len(lista_de_pontos1))
+
+    # Troca os segmentos entre os dois pontos de corte
+    nova_lista.extend(lista_de_pontos1[:corte1])
+    nova_lista.extend(lista_de_pontos2[corte1:corte2])
+    nova_lista.extend(lista_de_pontos1[corte2:])
+    
+    return nova_lista
+    
+#cruzamento tipo random, utilizando set para nao ter pontos duplicados
+def crossover_custom(lista_de_pontos1, lista_de_pontos2):
+    nova_lista = []
+    nova_lista = set(nova_lista)
+
+    random_number = random.randint(1, 50)
+
+    for i in range(0, random_number):
+        nova_lista.add(lista_de_pontos1[i])
+
+    for i in range(0, len(lista_de_pontos2)):
+        if nova_lista.__contains__(lista_de_pontos2[i]):
+            continue
+        else:
+            nova_lista.add(lista_de_pontos2[i])
+
+    nova_lista = list(nova_lista)
+    return nova_lista
+
+def distinct_check(lista_de_pontos):
+    soma = 0
+
+    for i in range(len(lista_de_pontos)):
+        soma += lista_de_pontos[i].id
+    
+    if soma == 1326:
+        return True
+    return False
 
 def fitness_threshold(fn_fitness, fn_thres, population):
     if not fn_thres:
@@ -161,10 +223,8 @@ def algoritmo_genetico_completo(caminhos_randomicos_quantidade, numero_geracoes,
         new_population = []
 
         for i in range(caminhos_randomicos_quantidade):
-            pai = selecao(data_population)
-            mae = selecao(data_population)
-
-            crianca = crossover(pai, mae)
+            pai, mae = selecao_dois_melhores(data_population)
+            crianca = crossover_custom(pai, mae)
 
             if random.random() <= rate_de_mutacao: 
                 crianca = mutate(crianca)
@@ -183,5 +243,5 @@ def algoritmo_genetico_completo(caminhos_randomicos_quantidade, numero_geracoes,
 melhor_solucao = algoritmo_genetico_completo(100, 500, 0.1, example)
 
 print(fitness(melhor_solucao))
-
-    
+#for i in range(len(melhor_solucao)):
+#    print(melhor_solucao[i].id)
