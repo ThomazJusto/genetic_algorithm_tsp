@@ -1,5 +1,6 @@
 import math
 import random
+from dataset import berlin52, eil51, pr152, rat99
 
 #objeto cidade
 class ponto:
@@ -7,60 +8,6 @@ class ponto:
         self.x = float(x)
         self.y = float(y)
         self.id = int(id)
-
-example = [
-    (1, 37.0, 52.0),
-    (2, 49.0, 49.0),
-    (3, 52.0, 64.0),
-    (4, 20.0, 26.0),
-    (5, 40.0, 30.0),
-    (6, 21.0, 47.0),
-    (7, 17.0, 63.0),
-    (8, 31.0, 62.0),
-    (9, 52.0, 33.0),
-    (10, 51.0, 21.0),
-    (11, 42.0, 41.0),
-    (12, 31.0, 32.0),
-    (13, 5.0, 25.0),
-    (14, 12.0, 42.0),
-    (15, 36.0, 16.0),
-    (16, 52.0, 41.0),
-    (17, 27.0, 23.0),
-    (18, 17.0, 33.0),
-    (19, 13.0, 13.0),
-    (20, 57.0, 58.0),
-    (21, 62.0, 42.0),
-    (22, 42.0, 57.0),
-    (23, 16.0, 57.0),
-    (24, 8.0, 52.0),
-    (25, 7.0, 38.0),
-    (26, 27.0, 68.0),
-    (27, 30.0, 48.0),
-    (28, 43.0, 67.0),
-    (29, 58.0, 48.0),
-    (30, 58.0, 27.0),
-    (31, 37.0, 69.0),
-    (32, 38.0, 46.0),
-    (33, 46.0, 10.0),
-    (34, 61.0, 33.0),
-    (35, 62.0, 63.0),
-    (36, 63.0, 69.0),
-    (37, 32.0, 22.0),
-    (38, 45.0, 35.0),
-    (39, 59.0, 15.0),
-    (40, 5.0, 6.0),
-    (41, 10.0, 17.0),
-    (42, 21.0, 10.0),
-    (43, 5.0, 64.0),
-    (44, 30.0, 15.0),
-    (45, 39.0, 10.0),
-    (46, 32.0, 39.0),
-    (47, 25.0, 32.0),
-    (48, 25.0, 55.0),
-    (49, 48.0, 28.0),
-    (50, 56.0, 37.0),
-    (51, 30.0, 40.0)
-]
 
 def gerador_de_lista_de_objetos_pontos(lista):
     data = []
@@ -86,7 +33,8 @@ def fitness(lista_de_pontos_no_mapa):
 def calcular_distancia(p1, p2):
         return math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
 
-#elitismo (recebe uma lista de mapas, ou seja, a posicao 0 conterá uma lista de pontos). Por isso utilizamos a funcao fitness para calculo de custo em cada iteracao
+# FUNCAO DE SELECAO 1(ELISTISMO -> SELECIONA O MELHOR DA LISTA QUE RECEBEU)
+# elitismo (recebe uma lista de mapas, ou seja, a posicao 0 conterá uma lista de pontos). Por isso utilizamos a funcao fitness para calculo de custo em cada iteracao
 # exemplo de estrutura que sera recebida: (ponto = objeto)
 # [
 #    [ponto, ponto, ponto...],
@@ -104,11 +52,11 @@ def selecao(lista_de_direcoes):
             custo = parametro
     return selecionado
 
-#retorna um caminho (lista de pontos) aleatorio
+# FUNCAO DE SELECAO 2(TORNEIO -> SELECIONA UM ALEATORIO DA LISTA QUE RECEBEU)
 def selecao_torneio(lista_de_direcoes):
     return lista_de_direcoes[random.randint(0, len(lista_de_direcoes))-1]
 
-#escolhe os dois melhores
+# FUNCAO DE SELECAO CUSTOMIZADA 3(SELECIONA O 1 MELHOR E O SEGUNDO MELHOR E RETORNA OS DOIS NA MESMA CHAMADA)
 def selecao_dois_melhores(lista_de_direcoes):
     lista_de_direcoes_auxiliar = lista_de_direcoes.copy()
 
@@ -120,15 +68,12 @@ def selecao_dois_melhores(lista_de_direcoes):
     
     return selecionado1, selecionado2
 
-#recebe uma lista de objetos e retorna uma nova ordem (lembrando que essa ordem esta ligada ao CAMINHO que esta sendo percorrido)
-#exemplo de recebimento:
-# [ponto, ponto, ponto...]
 def geracao_de_caminho_randomico(lista_de_pontos):
     nova_ordem = lista_de_pontos[:]  # Cria uma cópia da lista original
     random.shuffle(nova_ordem)  # Embaralha a nova lista
     return nova_ordem
 
-#mutacao tipo SWAP
+# FUNCAO DE MUTACAO 1(MUTACAO DO TIPO SWAP ALEATORIO)
 def mutate(lista_de_pontos):
     # Seleciona aleatoriamente um índice válido na lista
     indice_aleatorio = random.randint(0, len(lista_de_pontos) - 1)
@@ -144,7 +89,16 @@ def mutate(lista_de_pontos):
     return lista_de_pontos
     #retorna [ponto, ponto, ponto...]
 
-#cruzamento tipo single-point -> reproducao -> recebe duas listas de pontos, e partir disso gera um filho (a escolha do corte é randomica)
+# FUNCAO DE MUTATE 2(MUTACAO DO TIPO UNIFORM)
+def mutate2(lista_de_pontos, numero_baixo, numero_alto):
+    nova_lista_de_pontos = []
+    for ponto in lista_de_pontos:
+        ponto = random.randint(numero_baixo, numero_alto)  # Gera um novo valor aleatório para o gene (0 ou 1)
+        nova_lista_de_pontos.append(nova_lista_de_pontos)
+    return nova_lista_de_pontos
+
+# FUNCAO DE CRUZAMENTO 1(N-POINT STYLE, PEGA PARTE DO PAI E PARTE DA MAE)
+# LEMBRANDO QUE SE PEGAMOS DOIS INDIVIDUOS DIFERENTES, PODEMOS ESTAR FAZENDO CRUZAMENTO COM PONTOS DUPLICADOS
 def crossover(lista_de_pontos1, lista_de_pontos2):
     nova_lista = []
     random_number = random.randint(0, len(lista_de_pontos2))
@@ -156,7 +110,8 @@ def crossover(lista_de_pontos1, lista_de_pontos2):
 
     return nova_lista
 
-#cruzamento tipo double-point 
+# FUNCAO DE CRUZAMENTO 2(DOUBLE POINT STYLE, PEGA PARTES DO PAI E PARTES DA MAE - 2 RECORTES NO INDIVIDUO)
+# LEMBRANDO QUE SE PEGAMOS DOIS INDIVIDUOS DIFERENTES, PODEMOS ESTAR FAZENDO CRUZAMENTO COM PONTOS DUPLICADOS
 def crossover_doublepoint(lista_de_pontos1, lista_de_pontos2):
     nova_lista = []
     
@@ -171,7 +126,7 @@ def crossover_doublepoint(lista_de_pontos1, lista_de_pontos2):
     
     return nova_lista
     
-#cruzamento tipo random, utilizando set para nao ter pontos duplicados
+# FUNCAO CRUZAMENTO 3(N-POINT POREM VERIFICA POR DUPLICADOS)
 def crossover_custom(lista_de_pontos1, lista_de_pontos2):
     nova_lista = []
     nova_lista = set(nova_lista)
@@ -190,6 +145,10 @@ def crossover_custom(lista_de_pontos1, lista_de_pontos2):
     nova_lista = list(nova_lista)
     return nova_lista
 
+# FUNCAO CROSSOVER ESTADO DA ARTE 4 
+# AN EFFICIENT CROSSOVER OPERATOR FOR TRAVELING SALESMAN PROBLEM
+# M. Rajabi Bahaabadi, A. Shariat Mohaymany*,† and M. Babaei
+# Iran University of Science and Technology, Faculty of Civil Engineering, Narmak, Tehran, Iran
 def crossover_perfect(lista_de_pontos1, lista_de_pontos2):
     offspring = []
 
@@ -233,49 +192,120 @@ def distinct_check(lista_de_pontos, valor_soma):
         return True
     return False
 
-def fitness_threshold(fn_fitness, fn_thres, population):
+def fitness_threshold(fitness, fn_thres, population):
     if not fn_thres:
         return None
 
-    fittest_individual = max(population, key=fn_fitness)
-    if fn_fitness(fittest_individual) >= fn_thres:
+    fittest_individual = min(population, key=fitness)
+    if fitness(fittest_individual) <= fn_thres:
         return fittest_individual
 
     return None
 
-def algoritmo_genetico_completo(caminhos_randomicos_quantidade, numero_geracoes, rate_de_mutacao, data, fn_thres=None):
+def impressao_solucao(data):
+    for i in range(len(data) - 1):
+        distancia = calcular_distancia(data[i], data[i+1])
+        print(f"ID: {data[i].id}, Distância até próximo ponto: {distancia}")
+    
+    # Imprimindo o último ponto
+    print(f"ID: {data[-1].id}, Distância até próximo ponto: Último ponto da lista")
+    print(f"Pontos unicos: {ids_unicos(data)}!!!")
+    print(f"Custo total: {fitness(data)}!!!")
+
+def ids_unicos(data):
+    ids = set()
+    for ponto in data:
+        if ponto.id in ids:
+            return False
+        else:
+            ids.add(ponto.id)
+    return True
+
+def algoritmo_genetico_completo(operador_selecao, operador_mutacao, operador_cruzamento, quantidade_inicial_populacao, quantidade_de_geracoes, taxa_de_mutacao, dataset, fitness_thresh=None):
     # Antes de tudo, vamos criar uma lista com objetos pontos, que foi a lista teste passada. 
     # O parametro 'data' é exatamente uma lista de pontos (NAO objetos)
-    data_sample = gerador_de_lista_de_objetos_pontos(data)
+
+    data_sample = gerador_de_lista_de_objetos_pontos(dataset)
 
     # Criar uma lista de tamanho caminhos_randomicos_quantidade, contendo listas de pontos, baseado no sample que temos
     data_population = []
-    for i in range(caminhos_randomicos_quantidade):
+    for i in range(quantidade_inicial_populacao):
         data_population.append(geracao_de_caminho_randomico(data_sample))
 
-    for i in range(numero_geracoes):
+    for i in range(quantidade_de_geracoes):
         new_population = []
 
-        for i in range(caminhos_randomicos_quantidade):
-            pai = selecao(data_population)
-            mae = selecao(data_population)
-            crianca = crossover_perfect(pai, mae)
+        for i in range(quantidade_inicial_populacao):
+            if(operador_selecao == 1):
+                pai = selecao(data_population)
+                mae = selecao(data_population)
+            elif(operador_selecao == 2):
+                pai = selecao_torneio(data_population)
+                mae = selecao_torneio(data_population)
+            elif(operador_selecao == 3):
+                pai, mae = selecao_dois_melhores(data_population)
 
-            if random.random() <= rate_de_mutacao: 
-                crianca = mutate(crianca)
+            if(operador_cruzamento == 1):
+                crianca = crossover(pai, mae)
+            elif(operador_cruzamento == 2):
+                crianca = crossover_doublepoint(pai, mae)
+            elif(operador_cruzamento == 3):
+                crianca = crossover_custom(pai, mae)
+            elif(operador_cruzamento == 4):
+                crianca = crossover_perfect(pai, mae)
+
+            if(operador_mutacao == 1):
+                if random.random() <= taxa_de_mutacao: 
+                    crianca = mutate(crianca)
+            elif(operador_mutacao == 2):
+                if random.random() <= taxa_de_mutacao: 
+                    crianca = mutate2(crianca)
             
             new_population.append(crianca)
 
         data_population = new_population
 
-        fittest_individual = fitness_threshold(fitness, fn_thres, data_population)
+        fittest_individual = fitness_threshold(fitness, fitness_thresh, data_population)
 
         if fittest_individual:
             return fittest_individual
-        
-    return max(data_population, key=fitness)
 
-melhor_solucao = algoritmo_genetico_completo(100, 1000, 0.2, example)
+    impressao_solucao(min(data_population, key=fitness))
+    return min(data_population, key=fitness)
 
-print(fitness(melhor_solucao))
-print(distinct_check(melhor_solucao, 1326))
+# caminhos_randomicos_quantidade = quanitidade de caminhos randomicos que vao servir de populacao inicial
+# numero_geracoes = quantidade de geracoes que o algoritmo vai criar
+# rate_de_mutacao = rate de mutacao
+# data = input de pontos (testdata)
+
+# SELECAO
+#   1 -> ELITISMO
+#   2 -> TORNEIO
+#   3 -> CUSTOM (1 E 2 melhores)
+
+# MUTACAO
+#   1 -> SWAP
+#   2 -> UNIFORM
+
+# CRUZAMENTO
+#   1 -> N-POINT
+#   2 -> DOUBLE-POINT
+#   3 -> N-POINT COM VERIFICACAO DE DUPLICADOS
+#   4 -> ESTADO DA ARTE
+
+# QUANTIDADE INICIAL DE POPULACAO(numero inteiro)
+# QUANTIDADE DE GERACOES(numero inteiro)
+# TAXA DE MUTACAO(float entre 0.0 e 0.99)
+# DATASET (berlin52, eil51, pr152, rat99)
+# FITNESS THRESHOLD (valor inteiro)
+
+operador_selecao = 1
+operador_mutacao = 1
+operador_cruzamento = 1
+quantidade_inicial_populacao = 500
+quantidade_de_geracoes = 200
+taxa_de_mutacao = 0.2
+dataset = eil51
+fitness_thresh = 500
+
+melhor_solucao = algoritmo_genetico_completo(operador_selecao, operador_mutacao, operador_cruzamento, quantidade_inicial_populacao, quantidade_de_geracoes, taxa_de_mutacao, dataset, fitness_thresh)
