@@ -115,34 +115,54 @@ def crossover(lista_de_pontos1, lista_de_pontos2):
 
     # Adiciona os pontos de lista_de_pontos1 até o ponto de crossover
     random_number = random.randint(0, len(lista_de_pontos2))
-    for i in range(random_number):
+    for i in range(0, random_number):
         ponto = lista_de_pontos1[i]
         if ponto not in nova_lista:
             nova_lista.append(ponto)
             genes_utilizados.add(ponto)
 
     # Adiciona os pontos de lista_de_pontos2 que não estão na nova lista
-    for i in range(random_number, len(lista_de_pontos2)):
+    i=0
+    while len(nova_lista) < len(lista_de_pontos2):
         ponto = lista_de_pontos2[i]
         if ponto not in genes_utilizados:
             nova_lista.append(ponto)
             genes_utilizados.add(ponto)
+        i = i + 1 
 
     return nova_lista
 
 # FUNÇÃO DE CRUZAMENTO 2 (DOUBLE POINT STYLE)
 def crossover_doublepoint(lista_de_pontos1, lista_de_pontos2):
     nova_lista = []
+    genes_utilizados = set()
     
     # Seleciona aleatoriamente dois pontos de corte
     corte1 = random.randint(0, len(lista_de_pontos1) - 1)
     corte2 = random.randint(corte1 + 1, len(lista_de_pontos1))
 
     # Troca os segmentos entre os dois pontos de corte
-    nova_lista.extend(ponto for ponto in lista_de_pontos1[:corte1] if ponto not in nova_lista)
-    nova_lista.extend(ponto for ponto in lista_de_pontos2[corte1:corte2] if ponto not in nova_lista)
-    nova_lista.extend(ponto for ponto in lista_de_pontos1[corte2:] if ponto not in nova_lista)
-    
+    i=0
+    while len(nova_lista) < corte1:
+        if lista_de_pontos1[i] not in genes_utilizados:
+            nova_lista.append(lista_de_pontos1[i])
+            genes_utilizados.add(lista_de_pontos1[i])
+        i = i +1
+
+    i=0
+    while len(nova_lista) < corte2:
+        if lista_de_pontos2[i] not in genes_utilizados:
+            nova_lista.append(lista_de_pontos2[i])
+            genes_utilizados.add(lista_de_pontos2[i])
+        i = i +1
+
+    i=0
+    while len(nova_lista) < len(lista_de_pontos2):
+        if lista_de_pontos1[i] not in genes_utilizados:
+            nova_lista.append(lista_de_pontos1[i])
+            genes_utilizados.add(lista_de_pontos1[i])
+        i = i +1
+
     return nova_lista
     
 
@@ -301,21 +321,40 @@ def algoritmo_genetico_completo(operador_selecao, operador_mutacao, operador_cru
 # DATASET (berlin52, eil51, pr152, rat99)
 # FITNESS THRESHOLD (valor inteiro)
 
-# operador_selecao = 1
-# operador_mutacao = 1
-# operador_cruzamento = 1
-# quantidade_inicial_populacao = 100
-# quantidade_de_geracoes = 200
-# taxa_de_mutacao = 0.1
-# dataset = berlin52
-# fitness_thresh = 7542
-# impressao_solucao(min(data_population, key=fitness))
+#operador_selecao = 1
+#operador_mutacao = 1
+#operador_cruzamento = 2
+#quantidade_inicial_populacao = 100
+#quantidade_de_geracoes = 200
+#taxa_de_mutacao = 0.1
+#dataset = eil51
+#fitness_thresh = 425
 
+#impressao_solucao(algoritmo_genetico_completo(operador_selecao, operador_mutacao, operador_cruzamento, quantidade_inicial_populacao, quantidade_de_geracoes, taxa_de_mutacao, dataset, fitness_thresh))
+lista_eil51 = []
 lista_berlin52 = []
 lista_pr152 = []
 lista_rat99 = []
 
-lista_berlin52.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.1, berlin52, 7542)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.2, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.3, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 2, 100, 200, 0.1, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 2, 100, 200, 0.2, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 2, 100, 200, 0.3, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 3, 100, 200, 0.1, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 3, 100, 200, 0.2, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 1, 3, 100, 200, 0.3, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 2, 3, 100, 200, 0.1, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 2, 3, 100, 200, 0.2, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 2, 3, 100, 200, 0.3, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(2, 2, 3, 100, 200, 0.1, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(2, 2, 3, 100, 200, 0.2, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(2, 2, 3, 100, 200, 0.3, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 2, 3, 100, 300, 0.3, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 2, 3, 200, 300, 0.3, eil51, 426)))
+lista_eil51.append(fitness(algoritmo_genetico_completo(1, 2, 3, 300, 400, 0.3, eil51, 426)))
+escrever_em_arquivo(lista_eil51, 'lista_eil51.txt')
+
 lista_berlin52.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.2, berlin52, 7542)))
 lista_berlin52.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.3, berlin52, 7542)))
 lista_berlin52.append(fitness(algoritmo_genetico_completo(1, 1, 2, 100, 200, 0.1, berlin52, 7542)))
@@ -333,6 +372,7 @@ lista_berlin52.append(fitness(algoritmo_genetico_completo(2, 2, 3, 100, 200, 0.3
 lista_berlin52.append(fitness(algoritmo_genetico_completo(1, 2, 3, 100, 300, 0.3, berlin52, 7542)))
 lista_berlin52.append(fitness(algoritmo_genetico_completo(1, 2, 3, 200, 300, 0.3, berlin52, 7542)))
 lista_berlin52.append(fitness(algoritmo_genetico_completo(1, 2, 3, 300, 400, 0.3, berlin52, 7542)))
+escrever_em_arquivo(lista_berlin52, 'lista_berlin52.txt')
 
 lista_pr152.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.1, pr152, 73682)))
 lista_pr152.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.2, pr152, 73682)))
@@ -352,6 +392,7 @@ lista_pr152.append(fitness(algoritmo_genetico_completo(2, 2, 3, 100, 200, 0.3, p
 lista_pr152.append(fitness(algoritmo_genetico_completo(1, 2, 3, 100, 300, 0.3, pr152, 73682)))
 lista_pr152.append(fitness(algoritmo_genetico_completo(1, 2, 3, 200, 300, 0.3, pr152, 73682)))
 lista_pr152.append(fitness(algoritmo_genetico_completo(1, 2, 3, 300, 400, 0.3, pr152, 73682)))
+escrever_em_arquivo(lista_pr152, 'lista_pr152.txt')
 
 lista_rat99.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.1, rat99, 1211)))
 lista_rat99.append(fitness(algoritmo_genetico_completo(1, 1, 1, 100, 200, 0.2, rat99, 1211)))
@@ -371,7 +412,4 @@ lista_rat99.append(fitness(algoritmo_genetico_completo(2, 2, 3, 100, 200, 0.3, r
 lista_rat99.append(fitness(algoritmo_genetico_completo(1, 2, 3, 100, 300, 0.3, rat99, 1211)))
 lista_rat99.append(fitness(algoritmo_genetico_completo(1, 2, 3, 200, 300, 0.3, rat99, 1211)))
 lista_rat99.append(fitness(algoritmo_genetico_completo(1, 2, 3, 300, 400, 0.3, rat99, 1211)))
-
-escrever_em_arquivo(lista_berlin52, 'lista_berlin52.txt')
-escrever_em_arquivo(lista_pr152, 'lista_pr152.txt')
 escrever_em_arquivo(lista_rat99, 'lista_rat99.txt')
